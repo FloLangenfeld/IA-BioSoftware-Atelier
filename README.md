@@ -20,6 +20,12 @@
 
 # Utilisation des IA génératives comme appui à la programmation et au scripting pour la biologie
 
+## Rendu
+
+- Ajouter l’outil utilisé (pléiade, chatGPT, copitot,...) : Claude (dans le navigateur)
+- Ajouter le modèle utilisé : claude Sonnet 4
+- Ajouter le nombre de requêtes réalisée : ||
+
 ## Information pratique et programme
 
 - <https://moodle.france-bioinformatique.fr/course/view.php?id=41>

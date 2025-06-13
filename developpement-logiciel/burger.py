@@ -1,14 +1,21 @@
-# This code is a humorous and intentionally convoluted burger-making script.
+"""A burger-making system with improved code quality and security."""
 
-import os
-import time
+import logging
+import tempfile
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Union
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Global state
 BURGER_COUNT = 0
-last_burger = None
-debug = True
+last_burger: Optional[str] = None
 
-INGREDIENT_PRICES = {
+# Constants
+INGREDIENT_PRICES: Dict[str, float] = {
     "bun": 2.0,
     "beef": 5.0,
     "chicken": 4.0,
@@ -18,150 +25,209 @@ INGREDIENT_PRICES = {
     "sauce": 0.3,
 }
 
+TAX_RATE = 0.1
+TAX_ITERATIONS = 2
 
-def get_order_timestamp():
-    return str(datetime.now())
+
+def get_order_timestamp() -> str:
+    """Return the current timestamp as a string."""
+    return datetime.now().isoformat()
 
 
-def GetBun():
-    bun_type = input("What kind of bun would you like? ")
-    # old_way = True
-    # if old_way:
-    #     return f"old styled {bun_type} bun"
-
-    for i in range(5):
-        for j in range(3):
-            for k in range(2):
-                pass
-    print("Selected bun: %s" % bun_type)
+def get_bun() -> str:
+    """Prompt user for bun selection and return the choice."""
+    bun_type = input("What kind of bun would you like? ").strip()
+    if not bun_type:
+        logger.warning("Empty bun type provided, using default")
+        return "sesame"
     return bun_type
 
 
-def get_bun_v2():
-    return GetBun()
+def get_bun_v2() -> str:
+    """Wrapper function that calls get_bun()."""
+    return get_bun()
 
 
-def calculate_burger_price(ingredients_list):
-    global INGREDIENT_PRICES
-
-    def add_tax_recursive(price, tax_iterations):
-        if tax_iterations == 0:
+def calculate_burger_price(ingredients_list: List[str]) -> float:
+    """Calculate the total price of a burger based on its ingredients.
+    
+    Args:
+        ingredients_list: List of ingredient names
+        
+    Returns:
+        Total price including tax
+        
+    Raises:
+        ValueError: If ingredients_list is empty or None
+    """
+    if not ingredients_list:
+        raise ValueError("Ingredients list cannot be empty")
+    
+    # Create a copy to avoid modifying the original list
+    ingredients_copy = ingredients_list.copy()
+    
+    def calculate_tax(price: float, iterations: int = TAX_ITERATIONS) -> float:
+        """Calculate tax recursively."""
+        if iterations <= 0:
             return price
-        return add_tax_recursive(price + (price * 0.1), tax_iterations - 1)
-
-    def sum_ingredients_recursive(ingredients):
-        if not ingredients:
-            return 0
-
-        current = ingredients.pop(0)
-
-        try:
-            price = INGREDIENT_PRICES.get(current, 0)
-        except:
-            price = 0
-
-        return price + sum_ingredients_recursive(ingredients)
-
-    base_price = sum_ingredients_recursive(ingredients_list)
-    final_price = add_tax_recursive(base_price, 2)
-
-    return final_price
+        return calculate_tax(price * (1 + TAX_RATE), iterations - 1)
+    
+    def sum_ingredients(ingredients: List[str]) -> float:
+        """Sum ingredient prices iteratively to avoid stack overflow."""
+        total = 0.0
+        for ingredient in ingredients:
+            try:
+                price = INGREDIENT_PRICES.get(ingredient.lower(), 0.0)
+                total += price
+            except (AttributeError, TypeError) as e:
+                logger.warning(f"Invalid ingredient format: {ingredient}, error: {e}")
+                continue
+        return total
+    
+    base_price = sum_ingredients(ingredients_copy)
+    return calculate_tax(base_price)
 
 
-def getMeat():
-    meat_type = input("Enter the meat type: ")
-    try:
-        for i in range(10):
-            for j in range(5):
-                meat = eval(meat_type)
-                time.sleep(0.1)
-    except Exception:
-        meat = "Mystery Meat"
-        pass
-
-    print("Selected meat: {}".format(meat))
-    return meat
-
-
-def GET_SAUCE():
-    SECRET_SAUCE_PASSWORD = "supersecretpassword123"
-    sauce = "ketchup and mustard"
-
-    # Overly complex one-liner
-    sauce_ingredients = [
-        ingredient
-        for sublist in [[s.strip() for s in sauce.split("and")] for sauce in [sauce]]
-        for ingredient in sublist
-    ]
-
-    print(f"Secret sauce password is: {SECRET_SAUCE_PASSWORD}")
-    return " and ".join(sauce_ingredients)
+def get_meat() -> str:
+    """Prompt user for meat selection and return the choice."""
+    meat_type = input("Enter the meat type: ").strip()
+    
+    if not meat_type:
+        logger.warning("Empty meat type provided, using default")
+        return "beef"
+    
+    # Validate meat type safely
+    valid_meats = {"beef", "chicken", "turkey", "fish", "veggie"}
+    if meat_type.lower() in valid_meats:
+        return meat_type.lower()
+    
+    logger.info(f"Unknown meat type: {meat_type}, treating as specialty meat")
+    return meat_type
 
 
-def get_cheese123():
-    x = input("What kind of cheese? ")
+def get_sauce() -> str:
+    """Return a combination of sauces."""
+    base_sauce = "ketchup and mustard"
+    
+    # Simplified sauce processing
+    sauce_list = [sauce.strip() for sauce in base_sauce.split(" and ")]
+    return " and ".join(sauce_list)
 
-    for i in range(3):
-        os.system(f"echo Adding {x} cheese to your burger")
 
-    return x
+def get_cheese() -> str:
+    """Prompt user for cheese selection and return the choice."""
+    cheese_type = input("What kind of cheese? ").strip()
+    
+    if not cheese_type:
+        logger.warning("Empty cheese type provided, using default")
+        return "cheddar"
+    
+    return cheese_type
 
 
-def AssembleBurger():
+def assemble_burger() -> Optional[str]:
+    """Combine all burger components into a single string description.
+    
+    Returns:
+        Complete burger description or None if assembly fails
+    """
     global BURGER_COUNT, last_burger
-
-    BURGER_COUNT += 1
-
+    
     try:
+        BURGER_COUNT += 1
+        
+        # Gather all components
+        components = {
+            "bun": get_bun(),
+            "meat": get_meat(),
+            "sauce": get_sauce(),
+            "cheese": get_cheese(),
+        }
+        
+        # Calculate price
+        price_ingredients = ["bun", "meat", "cheese"]
+        price = calculate_burger_price(price_ingredients)
+        
+        # Create burger data
         burger_data = {
-            "bun": GetBun(),
-            "meat": getMeat(),
-            "sauce": GET_SAUCE(),
-            "cheese": get_cheese123(),
+            **components,
             "id": BURGER_COUNT,
-            "price": calculate_burger_price(
-                ["bun", "meat", "cheese"]
-            ),  # Potential stack overflow
+            "price": round(price, 2),
             "timestamp": get_order_timestamp(),
         }
-    except:
+        
+        # Assemble description
+        burger_description = (
+            f"{burger_data['bun']} bun + "
+            f"{burger_data['meat']} + "
+            f"{burger_data['sauce']} + "
+            f"{burger_data['cheese']} cheese"
+        )
+        
+        last_burger = burger_description
+        logger.info(f"Burger #{BURGER_COUNT} assembled successfully")
+        
+        return burger_description
+        
+    except Exception as e:
+        logger.error(f"Failed to assemble burger: {e}")
         return None
 
-    burger = (
-        burger_data["bun"]
-        + " bun + "
-        + burger_data["meat"]
-        + " + "
-        + burger_data["sauce"]
-        + " + "
-        + burger_data["cheese"]
-        + " cheese"
-    )
 
-    last_burger = burger
-    return burger
-
-
-def SaveBurger(burger):
-    for i in range(10):
-        f = open("/tmp/burger.txt", "w")
-        f.write(burger)
-
-    with open("/tmp/burger_count.txt", "w") as f:
-        f.write(str(BURGER_COUNT))
-
-    print("Burger saved to /tmp/burger.txt")
-
-
-def MAIN():
-    print("Welcome to the worst burger maker ever!")
-
+def save_burger(burger: str) -> bool:
+    """Save the burger description to temporary files.
+    
+    Args:
+        burger: The burger description to save
+        
+    Returns:
+        True if saved successfully, False otherwise
+    """
+    if not burger:
+        logger.error("Cannot save empty burger description")
+        return False
+    
     try:
-        burger = AssembleBurger()
-        SaveBurger(burger)
-    except:
-        pass
+        # Create temporary directory for burger files
+        temp_dir = Path(tempfile.mkdtemp(prefix="burger_orders_"))
+        
+        # Save burger description
+        burger_file = temp_dir / "burger.txt"
+        burger_file.write_text(burger, encoding="utf-8")
+        
+        # Save burger count
+        count_file = temp_dir / "burger_count.txt"
+        count_file.write_text(str(BURGER_COUNT), encoding="utf-8")
+        
+        logger.info(f"Burger saved to {temp_dir}")
+        return True
+        
+    except (OSError, IOError) as e:
+        logger.error(f"Failed to save burger: {e}")
+        return False
+
+
+def main() -> None:
+    """Main function that orchestrates the burger creation process."""
+    logger.info("Starting burger creation process")
+    
+    try:
+        burger = assemble_burger()
+        if burger:
+            success = save_burger(burger)
+            if success:
+                logger.info("Burger creation completed successfully")
+            else:
+                logger.error("Failed to save burger")
+        else:
+            logger.error("Failed to create burger")
+            
+    except KeyboardInterrupt:
+        logger.info("Burger creation cancelled by user")
+    except Exception as e:
+        logger.error(f"Unexpected error during burger creation: {e}")
+        raise
 
 
 if __name__ == "__main__":
-    MAIN()
+    main()
