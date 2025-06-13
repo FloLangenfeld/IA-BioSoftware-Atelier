@@ -2,6 +2,7 @@
 
 # Assuming burger.py is in src/ directory
 import sys
+import tempfile
 from datetime import datetime
 from unittest.mock import Mock, patch
 
@@ -273,7 +274,7 @@ class TestSaveBurger:
     def test_successful_save(self, mock_logger, mock_path, mock_mkdtemp):
         """Test successful burger save."""
         # Setup mocks
-        mock_temp_dir = "/tmp/burger_test"
+        mock_temp_dir = tempfile.TemporaryDirectory()
         mock_mkdtemp.return_value = mock_temp_dir
 
         mock_path_instance = Mock()
