@@ -1,0 +1,13 @@
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+
+# Code quality
+ruff>=0.1.0
+bandit>=1.7.0
+safety>=2.3.0
+
+# Development
+black>=23.0.0
+isort>=5.12.0
