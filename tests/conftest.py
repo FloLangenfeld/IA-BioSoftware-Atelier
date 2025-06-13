@@ -1,15 +1,9 @@
 """Pytest configuration and fixtures for burger tests."""
 
-import sys
-from pathlib import Path
 
 import pytest
 
-# Add src directory to Python path
-src_path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(src_path))
-
-import burger
+from src import burger
 
 
 @pytest.fixture(autouse=True)
