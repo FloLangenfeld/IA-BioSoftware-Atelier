@@ -1,9 +1,8 @@
 """Pytest configuration and fixtures for burger tests."""
 
-
 import pytest
 
-from src import burger
+import burger
 
 
 @pytest.fixture(autouse=True)
@@ -36,7 +35,7 @@ def mock_burger_components():
         "bun": "sesame",
         "meat": "beef",
         "sauce": "ketchup and mustard",
-        "cheese": "cheddar"
+        "cheese": "cheddar",
     }
 
 
@@ -44,4 +43,4 @@ def mock_burger_components():
 def expected_price():
     """Calculate expected price for standard burger."""
     # (bun: 2.0 + beef: 5.0 + cheese: 1.0) * 1.1 * 1.1
-    return 8.0 * (1.1 ** 2)
+    return 8.0 * (1.1**2)

@@ -82,7 +82,9 @@ def calculate_burger_price(ingredients_list: list[str]) -> float:
                 price = INGREDIENT_PRICES.get(ingredient.lower(), 0.0)
                 total += price
             except (AttributeError, TypeError) as e:
-                logger.warning("Invalid ingredient format: %s, error: %s", ingredient, e)
+                logger.warning(
+                    "Invalid ingredient format: %s, error: %s", ingredient, e
+                )
                 continue
         return total
 

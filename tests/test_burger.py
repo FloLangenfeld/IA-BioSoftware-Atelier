@@ -86,7 +86,7 @@ class TestCalculateBurgerPrice:
         result = burger.calculate_burger_price(ingredients)
 
         # Expected: (2.0 + 5.0 + 1.0) * 1.1 * 1.1 = 9.68
-        expected = 8.0 * (1.1 ** 2)
+        expected = 8.0 * (1.1**2)
         assert abs(result - expected) < 0.01
 
     def test_empty_ingredients_raises_error(self):
@@ -105,7 +105,7 @@ class TestCalculateBurgerPrice:
         result = burger.calculate_burger_price(ingredients)
 
         # Should only count bun (2.0) and cheese (1.0)
-        expected = 3.0 * (1.1 ** 2)
+        expected = 3.0 * (1.1**2)
         assert abs(result - expected) < 0.01
 
     def test_case_insensitive_ingredients(self):
@@ -113,7 +113,7 @@ class TestCalculateBurgerPrice:
         ingredients = ["BUN", "BEEF", "CHEESE"]
         result = burger.calculate_burger_price(ingredients)
 
-        expected = 8.0 * (1.1 ** 2)
+        expected = 8.0 * (1.1**2)
         assert abs(result - expected) < 0.01
 
     def test_original_list_not_modified(self):
@@ -224,7 +224,9 @@ class TestAssembleBurger:
     @patch("burger.get_sauce", return_value="ketchup and mustard")
     @patch("burger.get_cheese", return_value="cheddar")
     @patch("burger.calculate_burger_price", return_value=10.50)
-    def test_successful_assembly(self, mock_price, mock_cheese, mock_sauce, mock_meat, mock_bun):
+    def test_successful_assembly(
+        self, mock_price, mock_cheese, mock_sauce, mock_meat, mock_bun
+    ):
         """Test successful burger assembly."""
         result = burger.assemble_burger()
 
@@ -247,7 +249,9 @@ class TestAssembleBurger:
     @patch("burger.get_sauce", return_value="mayo")
     @patch("burger.get_cheese", return_value="swiss")
     @patch("burger.calculate_burger_price", return_value=12.75)
-    def test_burger_count_increments(self, mock_price, mock_cheese, mock_sauce, mock_meat, mock_bun):
+    def test_burger_count_increments(
+        self, mock_price, mock_cheese, mock_sauce, mock_meat, mock_bun
+    ):
         """Test that burger count increments properly."""
         burger.assemble_burger()
         burger.assemble_burger()
@@ -282,14 +286,18 @@ class TestSaveBurger:
         mock_count_file = Mock()
 
         mock_path.return_value = mock_path_instance
-        mock_path_instance.__truediv__ = Mock(side_effect=[mock_burger_file, mock_count_file])
+        mock_path_instance.__truediv__ = Mock(
+            side_effect=[mock_burger_file, mock_count_file]
+        )
 
         # Test
         result = burger.save_burger("test burger")
 
         # Assertions
         assert result is True
-        mock_burger_file.write_text.assert_called_once_with("test burger", encoding="utf-8")
+        mock_burger_file.write_text.assert_called_once_with(
+            "test burger", encoding="utf-8"
+        )
         mock_count_file.write_text.assert_called_once()
         mock_logger.info.assert_called_once()
 
