@@ -22,7 +22,7 @@
 
 ## Rendu
 
-- Ajouter l’outil utilisé (pléiade, chatGPT, copitot,...) : Claude (dans le navigateur)
+- Ajouter l’outil utilisé (pléiade, chatGPT, copitot,...) : Claude + perplexity
 - Ajouter le modèle utilisé : claude Sonnet 4
 - Ajouter le nombre de requêtes réalisée : ||||- 
 

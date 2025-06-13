@@ -44,34 +44,36 @@ def get_bun() -> str:
 
 
 def get_bun_v2() -> str:
-    """Wrapper function that calls get_bun()."""
+    """Wrap the function get_bun()."""
     return get_bun()
 
 
 def calculate_burger_price(ingredients_list: list[str]) -> float:
-    """Calculate the total price of a burger based on its ingredients.
-    
+    """
+    Calculate the total price of a burger based on its ingredients.
+
     Args:
         ingredients_list: List of ingredient names
-        
+
     Returns:
         Total price including tax
-        
+
     Raises:
         ValueError: If ingredients_list is empty or None
+
     """
     if not ingredients_list:
         raise ValueError("Ingredients list cannot be empty")
-    
+
     # Create a copy to avoid modifying the original list
     ingredients_copy = ingredients_list.copy()
-    
+
     def calculate_tax(price: float, iterations: int = TAX_ITERATIONS) -> float:
         """Calculate tax recursively."""
         if iterations <= 0:
             return price
         return calculate_tax(price * (1 + TAX_RATE), iterations - 1)
-    
+
     def sum_ingredients(ingredients: list[str]) -> float:
         """Sum ingredient prices iteratively to avoid stack overflow."""
         total = 0.0
@@ -80,10 +82,10 @@ def calculate_burger_price(ingredients_list: list[str]) -> float:
                 price = INGREDIENT_PRICES.get(ingredient.lower(), 0.0)
                 total += price
             except (AttributeError, TypeError) as e:
-                logger.warning(f"Invalid ingredient format: {ingredient}, error: {e}")
+                logger.warning("Invalid ingredient format: %s, error: %s", ingredient, e)
                 continue
         return total
-    
+
     base_price = sum_ingredients(ingredients_copy)
     return calculate_tax(base_price)
 
@@ -91,24 +93,24 @@ def calculate_burger_price(ingredients_list: list[str]) -> float:
 def get_meat() -> str:
     """Prompt user for meat selection and return the choice."""
     meat_type = input("Enter the meat type: ").strip()
-    
+
     if not meat_type:
         logger.warning("Empty meat type provided, using default")
         return "beef"
-    
+
     # Validate meat type safely
     valid_meats = {"beef", "chicken", "turkey", "fish", "veggie"}
     if meat_type.lower() in valid_meats:
         return meat_type.lower()
-    
-    logger.info(f"Unknown meat type: {meat_type}, treating as specialty meat")
+
+    logger.info("Unknown meat type: %s, treating as specialty meat", meat_type)
     return meat_type
 
 
 def get_sauce() -> str:
     """Return a combination of sauces."""
     base_sauce = "ketchup and mustard"
-    
+
     # Simplified sauce processing
     sauce_list = [sauce.strip() for sauce in base_sauce.split(" and ")]
     return " and ".join(sauce_list)
@@ -117,25 +119,27 @@ def get_sauce() -> str:
 def get_cheese() -> str:
     """Prompt user for cheese selection and return the choice."""
     cheese_type = input("What kind of cheese? ").strip()
-    
+
     if not cheese_type:
         logger.warning("Empty cheese type provided, using default")
         return "cheddar"
-    
+
     return cheese_type
 
 
 def assemble_burger() -> Optional[str]:
-    """Combine all burger components into a single string description.
-    
+    """
+    Combine all burger components into a single string description.
+
     Returns:
         Complete burger description or None if assembly fails
+
     """
     global BURGER_COUNT, last_burger
-    
+
     try:
         BURGER_COUNT += 1
-        
+
         # Gather all components
         components = {
             "bun": get_bun(),
@@ -143,11 +147,11 @@ def assemble_burger() -> Optional[str]:
             "sauce": get_sauce(),
             "cheese": get_cheese(),
         }
-        
+
         # Calculate price
         price_ingredients = ["bun", "meat", "cheese"]
         price = calculate_burger_price(price_ingredients)
-        
+
         # Create burger data
         burger_data = {
             **components,
@@ -155,7 +159,7 @@ def assemble_burger() -> Optional[str]:
             "price": round(price, 2),
             "timestamp": get_order_timestamp(),
         }
-        
+
         # Assemble description
         burger_description = (
             f"{burger_data['bun']} bun + "
@@ -163,54 +167,56 @@ def assemble_burger() -> Optional[str]:
             f"{burger_data['sauce']} + "
             f"{burger_data['cheese']} cheese"
         )
-        
+
         last_burger = burger_description
-        logger.info(f"Burger #{BURGER_COUNT} assembled successfully")
-        
+        logger.info("Burger #%s assembled successfully", BURGER_COUNT)
+
         return burger_description
-        
+
     except Exception as e:
-        logger.error(f"Failed to assemble burger: {e}")
+        logger.error("Failed to assemble burger: %s", e)
         return None
 
 
 def save_burger(burger: str) -> bool:
-    """Save the burger description to temporary files.
-    
+    """
+    Save the burger description to temporary files.
+
     Args:
         burger: The burger description to save
-        
+
     Returns:
         True if saved successfully, False otherwise
+
     """
     if not burger:
         logger.error("Cannot save empty burger description")
         return False
-    
+
     try:
         # Create temporary directory for burger files
         temp_dir = Path(tempfile.mkdtemp(prefix="burger_orders_"))
-        
+
         # Save burger description
         burger_file = temp_dir / "burger.txt"
         burger_file.write_text(burger, encoding="utf-8")
-        
+
         # Save burger count
         count_file = temp_dir / "burger_count.txt"
         count_file.write_text(str(BURGER_COUNT), encoding="utf-8")
-        
-        logger.info(f"Burger saved to {temp_dir}")
+
+        logger.info("Burger saved to %s", temp_dir)
         return True
-        
+
     except (OSError, IOError) as e:
-        logger.error(f"Failed to save burger: {e}")
+        logger.error("Failed to save burger: %s", e)
         return False
 
 
 def main() -> None:
-    """Main function that orchestrates the burger creation process."""
+    """Orchestrates the burger creation process."""
     logger.info("Starting burger creation process")
-    
+
     try:
         burger = assemble_burger()
         if burger:
@@ -221,11 +227,11 @@ def main() -> None:
                 logger.error("Failed to save burger")
         else:
             logger.error("Failed to create burger")
-            
+
     except KeyboardInterrupt:
         logger.info("Burger creation cancelled by user")
     except Exception as e:
-        logger.error(f"Unexpected error during burger creation: {e}")
+        logger.error("Unexpected error during burger creation: %s", e)
         raise
 
 

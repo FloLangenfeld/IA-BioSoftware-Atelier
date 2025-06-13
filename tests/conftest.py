@@ -1,8 +1,9 @@
 """Pytest configuration and fixtures for burger tests."""
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add src directory to Python path
 src_path = Path(__file__).parent.parent / "src"
@@ -16,13 +17,13 @@ def reset_global_state():
     """Reset global state before each test."""
     original_count = burger.BURGER_COUNT
     original_last = burger.last_burger
-    
+
     # Reset for test
     burger.BURGER_COUNT = 0
     burger.last_burger = None
-    
+
     yield
-    
+
     # Restore original state
     burger.BURGER_COUNT = original_count
     burger.last_burger = original_last
@@ -31,17 +32,17 @@ def reset_global_state():
 @pytest.fixture
 def sample_ingredients():
     """Provide sample ingredients for testing."""
-    return ['bun', 'beef', 'cheese']
+    return ["bun", "beef", "cheese"]
 
 
 @pytest.fixture
 def mock_burger_components():
     """Provide mock burger components."""
     return {
-        'bun': 'sesame',
-        'meat': 'beef',
-        'sauce': 'ketchup and mustard',
-        'cheese': 'cheddar'
+        "bun": "sesame",
+        "meat": "beef",
+        "sauce": "ketchup and mustard",
+        "cheese": "cheddar"
     }
 
 
