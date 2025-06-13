@@ -4,7 +4,7 @@ import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +15,7 @@ BURGER_COUNT = 0
 last_burger: Optional[str] = None
 
 # Constants
-INGREDIENT_PRICES: Dict[str, float] = {
+INGREDIENT_PRICES: dict[str, float] = {
     "bun": 2.0,
     "beef": 5.0,
     "chicken": 4.0,
@@ -48,7 +48,7 @@ def get_bun_v2() -> str:
     return get_bun()
 
 
-def calculate_burger_price(ingredients_list: List[str]) -> float:
+def calculate_burger_price(ingredients_list: list[str]) -> float:
     """Calculate the total price of a burger based on its ingredients.
     
     Args:
@@ -72,7 +72,7 @@ def calculate_burger_price(ingredients_list: List[str]) -> float:
             return price
         return calculate_tax(price * (1 + TAX_RATE), iterations - 1)
     
-    def sum_ingredients(ingredients: List[str]) -> float:
+    def sum_ingredients(ingredients: list[str]) -> float:
         """Sum ingredient prices iteratively to avoid stack overflow."""
         total = 0.0
         for ingredient in ingredients:
